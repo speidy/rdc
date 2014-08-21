@@ -21,6 +21,7 @@ import logging
 import os
 from os import path
 from threading import Thread
+import time
 
 import model
 from model import RdpSettingsReader, ListEntry, RdpSettingsWriter
@@ -35,7 +36,7 @@ logging.getLogger().setLevel(settings.LOG_LEVEL)
 def wait_for_proc_thread(pid):
     rv = os.waitpid(pid, 0)
     while (rv[1] != 0):
-        os.sleep(1)
+        time.sleep(1)
         rv = os.waitpid(pid, 0)
     return rv
 
