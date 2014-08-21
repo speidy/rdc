@@ -20,8 +20,6 @@ import optparse
 import logging
 import os
 from os import path
-from threading import Thread
-import time
 
 import model
 from model import RdpSettingsReader, ListEntry, RdpSettingsWriter
@@ -32,13 +30,6 @@ running_configuration = {}
 BUTTONS_HAVE_ICONS_GCONF_PATH = "/desktop/gnome/interface/buttons_have_icons"
 
 logging.getLogger().setLevel(settings.LOG_LEVEL)
-
-def wait_for_proc_thread(pid):
-    rv = os.waitpid(pid, 0)
-    while (rv[1] != 0):
-        time.sleep(1)
-        rv = os.waitpid(pid, 0)
-    return rv
 
 def enable_button_icons_hack():
     """A dirty function that modifies a GNOME setting so that rdc_ui would display well..
@@ -134,10 +125,6 @@ class RdcUI(object):
                 password=pwd,
                 dualmon=should_dualmon,
             )
-            # wait for process in a different thread
-            logging.info("wait for proc: %s in a thread", proc)
-            thread = Thread(target = wait_for_proc_thread, args = (proc, ))
-            thread.start()
         except connection.ConnectionFailedError:
             logging.error("Connection failed")
             messagebox = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message_format="Failed connecting to '%s'" % (fields["address"]))

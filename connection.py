@@ -6,9 +6,15 @@ import settings
 import getpass
 import os
 import datetime
+from threading import Thread
 
 class ConnectionFailedError(Exception):
     pass
+
+def wait_for_process(proc):
+    rv = proc.wait()
+    return rv
+
 
 def is_address_accessible(address):
     try:
@@ -51,5 +57,8 @@ def rdp_connect(address, user="", domain="", password="", dualmon=False):
     if rc is not None:
         logging.error("Process had died too quickly, rc=%d", rc)
         raise ConnectionFailedError()
-    
+    # wait for child process to terminate
+    thread = Thread(target = wait_for_process, args = (proc, ))
+    thread.start() 
+
     return proc.pid
